@@ -3,6 +3,7 @@ package vn.hoidanit.jobhunter.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +50,9 @@ public class UserService {
         return this.userRepository.findAll();
     }
 
-    public User handleGetUserByUsername(String username) {
-        return this.userRepository.findByEmail(username);
+    public User handleGetUserByUsername(String username) throws UsernameNotFoundException {
+        User user = this.userRepository.findByEmail(username);
+        return user;
     }
+
 }

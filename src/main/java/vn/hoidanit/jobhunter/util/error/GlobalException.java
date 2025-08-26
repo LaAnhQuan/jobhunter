@@ -1,7 +1,6 @@
 package vn.hoidanit.jobhunter.util.error;
 
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -20,15 +19,14 @@ import vn.hoidanit.jobhunter.domain.RestResponse;
 
 public class GlobalException {
     @ExceptionHandler(value = {
-            IdInvalidException.class,
             UsernameNotFoundException.class,
             BadCredentialsException.class
     })
-    public ResponseEntity<RestResponse<Object>> handleIdException(IdInvalidException idException) {
+    public ResponseEntity<RestResponse<Object>> handleIdException(Exception ex) {
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        res.setError(idException.getMessage());
-        res.setMessage("IdInvalidException");
+        res.setError(ex.getMessage());
+        res.setMessage("Exception occurs...");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
