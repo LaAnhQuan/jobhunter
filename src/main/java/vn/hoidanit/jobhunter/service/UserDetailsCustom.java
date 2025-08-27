@@ -22,9 +22,9 @@ public class UserDetailsCustom implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         vn.hoidanit.jobhunter.domain.User user = this.userService.handleGetUserByUsername(username);
 
-        // if (user == null) {
-        // throw new UsernameNotFoundException("User not found with email: ");
-        // }
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with email: ");
+        }
 
         return new User(
                 user.getEmail(),
