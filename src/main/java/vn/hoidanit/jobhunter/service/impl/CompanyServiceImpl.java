@@ -1,6 +1,5 @@
 package vn.hoidanit.jobhunter.service.impl;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.data.domain.Page;
