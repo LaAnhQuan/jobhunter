@@ -11,39 +11,65 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.validation.FieldError;
 
 import vn.hoidanit.jobhunter.domain.RestResponse;
 
 @RestControllerAdvice
-
 public class GlobalException {
-    @ExceptionHandler(value = {
-            UsernameNotFoundException.class,
-            BadCredentialsException.class
+
+    // 400 - Bad Request (input sai, request không hợp lệ)
+    @ExceptionHandler({
+            IllegalArgumentException.class,
+            BadCredentialsException.class,
+            NullPointerException.class,
+            IdInvalidException.class
     })
-    public ResponseEntity<RestResponse<Object>> handleIdException(Exception ex) {
-        RestResponse<Object> res = new RestResponse<Object>();
+    public ResponseEntity<RestResponse<Object>> handleBadRequest(Exception ex) {
+        RestResponse<Object> res = new RestResponse<>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
         res.setError(ex.getMessage());
-        res.setMessage("Exception occurs...");
+        res.setMessage("Bad request");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
+    // 404 - Not Found (không tìm thấy resource)
+    @ExceptionHandler({
+            UsernameNotFoundException.class,
+            NoResourceFoundException.class
+    })
+    public ResponseEntity<RestResponse<Object>> handleNotFound(Exception ex) {
+        RestResponse<Object> res = new RestResponse<>();
+        res.setStatusCode(HttpStatus.NOT_FOUND.value());
+        res.setError(ex.getMessage());
+        res.setMessage("404 Not Found. URL may not exist...");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+    }
+
+    // 400 - Validation Error (lỗi @Valid / @Validated)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<RestResponse<Object>> validationError(
-            MethodArgumentNotValidException ex) {
+    public ResponseEntity<RestResponse<Object>> handleValidationError(MethodArgumentNotValidException ex) {
         BindingResult result = ex.getBindingResult();
-        final List<FieldError> fieldErrors = result.getFieldErrors();
+        List<String> errors = result.getFieldErrors()
+                .stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.toList());
 
-        RestResponse<Object> res = new RestResponse<Object>();
+        RestResponse<Object> res = new RestResponse<>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        res.setError(ex.getBody().getDetail());
-
-        List<String> errors = fieldErrors.stream().map(f -> f.getDefaultMessage()).collect(Collectors.toList());
-
-        res.setMessage(errors.size() > 1 ? errors : errors.get(0));
+        res.setError("Validation failed");
+        res.setMessage(errors); // luôn trả về list cho đồng nhất
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
+    // 500 - Server error (bắt tất cả còn lại)
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<RestResponse<Object>> handleServerError(Exception ex) {
+        RestResponse<Object> res = new RestResponse<>();
+        res.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        res.setError(ex.getMessage());
+        res.setMessage("Internal server error");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+    }
 }
