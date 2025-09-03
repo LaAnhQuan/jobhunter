@@ -3,6 +3,7 @@ package vn.hoidanit.jobhunter.service;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import vn.hoidanit.jobhunter.domain.User;
@@ -18,7 +19,7 @@ public interface UserService {
 
     Optional<User> handleUpdateUser(User user);
 
-    ResultPaginationDTO handleFetchAllUser(Pageable pageable);
+    ResultPaginationDTO handleFetchAllUser(Specification<User> spec, Pageable pageable);
 
     User handleGetUserByUsername(String username) throws UsernameNotFoundException;
 
