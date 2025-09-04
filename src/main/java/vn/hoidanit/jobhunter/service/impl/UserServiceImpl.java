@@ -32,6 +32,15 @@ public class UserServiceImpl implements UserService {
         return this.userRepository.existsByEmail(email);
     }
 
+    @Override
+    public void updateUserToken(String token, String email) {
+        User currentUser = this.handleGetUserByUsername(email);
+        if(currentUser != null){
+            currentUser.setRefreshToken(token);
+            this.userRepository.save(currentUser);
+        }
+    }
+
     public ResCreUserDTO handleCreateUser(User user) {
         User newUser = this.userRepository.save(user);
         return UserMapper.toResCreUserDTO(newUser);

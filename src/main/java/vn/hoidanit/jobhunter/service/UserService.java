@@ -25,4 +25,6 @@ public interface UserService {
     User handleGetUserByUsername(String username) throws UsernameNotFoundException;
 
     boolean isEmailExist(String email);
+
+    void updateUserToken(String token, String email);
 }
