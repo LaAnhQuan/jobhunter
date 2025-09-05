@@ -29,4 +29,5 @@ public interface UserService {
     void updateUserToken(String token, String email);
 
     User getUserByRefreshTokenAndToken(String token, String email);
+
 }

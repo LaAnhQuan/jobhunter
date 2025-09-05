@@ -102,4 +102,5 @@ public class UserServiceImpl implements UserService {
     public User getUserByRefreshTokenAndToken(String token, String email) {
         return this.userRepository.findByRefreshTokenAndEmail(token, email);
     }
+
 }
