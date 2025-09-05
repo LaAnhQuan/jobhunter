@@ -11,7 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.domain.dto.Meta;
 import vn.hoidanit.jobhunter.domain.dto.ResCreUserDTO;
 import vn.hoidanit.jobhunter.domain.dto.ResUpUserDTO;
 import vn.hoidanit.jobhunter.domain.dto.ResUserDTO;
@@ -81,7 +80,7 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
 
         // Meta info
-        Meta mt = new Meta();
+        ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
         mt.setPage(pageable.getPageNumber() + 1);
         mt.setPageSize(pageable.getPageSize());
         mt.setPages(pageUser.getTotalPages());
