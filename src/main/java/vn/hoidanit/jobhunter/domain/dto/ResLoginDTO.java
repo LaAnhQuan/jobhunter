@@ -1,6 +1,5 @@
 package vn.hoidanit.jobhunter.domain.dto;
 
-import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
