@@ -1,9 +1,9 @@
 package vn.hoidanit.jobhunter.mapper;
 
 import vn.hoidanit.jobhunter.domain.User;
-import vn.hoidanit.jobhunter.domain.dto.ResCreUserDTO;
-import vn.hoidanit.jobhunter.domain.dto.ResUpUserDTO;
-import vn.hoidanit.jobhunter.domain.dto.ResUserDTO;
+import vn.hoidanit.jobhunter.domain.response.ResCreUserDTO;
+import vn.hoidanit.jobhunter.domain.response.ResUpUserDTO;
+import vn.hoidanit.jobhunter.domain.response.ResUserDTO;
 
 public class UserMapper {
 
