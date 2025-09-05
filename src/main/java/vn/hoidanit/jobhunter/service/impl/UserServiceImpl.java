@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUserToken(String token, String email) {
         User currentUser = this.handleGetUserByUsername(email);
-        if(currentUser != null){
+        if (currentUser != null) {
             currentUser.setRefreshToken(token);
             this.userRepository.save(currentUser);
         }
@@ -96,5 +96,10 @@ public class UserServiceImpl implements UserService {
 
     public User handleGetUserByUsername(String username) throws UsernameNotFoundException {
         return this.userRepository.findByEmail(username);
+    }
+
+    @Override
+    public User getUserByRefreshTokenAndToken(String token, String email) {
+        return this.userRepository.findByRefreshTokenAndEmail(token, email);
     }
 }
