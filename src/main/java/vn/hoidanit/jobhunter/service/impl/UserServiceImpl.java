@@ -1,6 +1,7 @@
 package vn.hoidanit.jobhunter.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -10,21 +11,26 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.response.ResCreUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUpUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.repository.UserRepository;
+import vn.hoidanit.jobhunter.service.CompanyService;
 import vn.hoidanit.jobhunter.service.UserService;
 import vn.hoidanit.jobhunter.mapper.UserMapper;
 
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final CompanyService companyService;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
+            CompanyService companyService) {
         this.userRepository = userRepository;
+        this.companyService = companyService;
     }
 
     public boolean isEmailExist(String email) {
@@ -41,8 +47,13 @@ public class UserServiceImpl implements UserService {
     }
 
     public ResCreUserDTO handleCreateUser(User user) {
-        User newUser = this.userRepository.save(user);
-        return UserMapper.toResCreUserDTO(newUser);
+        // check company
+        if (user.getCompany() != null) {
+            Optional<Company> companyOptional = this.companyService.findById(user.getCompany().getId());
+            user.setCompany(companyOptional.isPresent() ? companyOptional.get() : null);
+        }
+        User savedUser = userRepository.save(user);
+        return UserMapper.toResCreUserDTO(savedUser);
     }
 
     public void handleDeleteUser(long id) {
@@ -65,6 +76,11 @@ public class UserServiceImpl implements UserService {
         existingUser.setGender(user.getGender());
         existingUser.setAge(user.getAge());
         existingUser.setAddress(user.getAddress());
+
+        if (user.getCompany() != null) {
+            Optional<Company> companyOptional = this.companyService.findById(user.getCompany().getId());
+            existingUser.setCompany(companyOptional.isPresent() ? companyOptional.get() : null);
+        }
 
         userRepository.save(existingUser);
         return UserMapper.toResUpUserDTO(existingUser);

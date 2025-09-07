@@ -4,12 +4,16 @@ import java.time.Instant;
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import vn.hoidanit.jobhunter.util.constant.GenderEnum;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ResUpUserDTO {
     private long id;
 
@@ -19,18 +23,17 @@ public class ResUpUserDTO {
     private GenderEnum gender;
     private String address;
     private int age;
-    private Instant createdAt;
+    private Instant updatedAt;
 
-    public ResUpUserDTO() {
-    }
+    private CompanyUser company;
 
-    public ResUpUserDTO(long id, String name, GenderEnum gender, String address, int age, Instant createdAt) {
-        this.id = id;
-        this.name = name;
-        this.gender = gender;
-        this.address = address;
-        this.age = age;
-        this.createdAt = createdAt;
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CompanyUser {
+        private long id;
+        private String name;
     }
 
 }

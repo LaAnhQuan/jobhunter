@@ -1,5 +1,7 @@
 package vn.hoidanit.jobhunter.service;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -15,5 +17,7 @@ public interface CompanyService {
     Company handleUpdateCompany(Company company);
 
     void handleDeleteCompany(Long id);
+
+    Optional<Company> findById(long id);
 
 }
