@@ -37,6 +37,8 @@ public class Job {
 
     private String name;
 
+    private String location;
+
     private double salary;
 
     private int quantity;
