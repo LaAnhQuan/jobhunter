@@ -21,7 +21,7 @@ import vn.hoidanit.jobhunter.util.SecurityUtil;
 import vn.hoidanit.jobhunter.util.constant.GenderEnum;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @Getter
 @Setter
 public class User {
