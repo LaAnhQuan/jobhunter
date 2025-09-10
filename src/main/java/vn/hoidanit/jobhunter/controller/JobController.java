@@ -1,7 +1,5 @@
 package vn.hoidanit.jobhunter.controller;
 
-import java.util.Optional;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -19,7 +17,6 @@ import com.turkraft.springfilter.boot.Filter;
 
 import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.Job;
-import vn.hoidanit.jobhunter.domain.request.ReqJobDTO;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.domain.response.job.ResCreJobDTO;
 import vn.hoidanit.jobhunter.service.JobService;
@@ -48,7 +45,7 @@ public class JobController {
         if (currentJob != null) {
             throw new IdInvalidException("Job not found");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(this.jobService.handleUpdateJob(job, currentJob.get()));
+        return ResponseEntity.status(HttpStatus.OK).body(this.jobService.handleUpdateJob(job, currentJob));
     }
 
     @DeleteMapping("/jobs/{id}")
