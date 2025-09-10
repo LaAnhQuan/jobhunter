@@ -59,7 +59,6 @@ public class ResumeServiceImpl implements ResumeService {
     @Override
     public ResUpResumeDTO update(Resume resume) {
         resume = this.resumeRepository.save(resume);
-        System.out.println("kkkk " + resume.getUpdatedBy());
         ResUpResumeDTO res = new ResUpResumeDTO();
         res.setUpdatedAt(resume.getUpdatedAt());
         res.setUpdatedBy(resume.getUpdatedBy());
@@ -88,6 +87,10 @@ public class ResumeServiceImpl implements ResumeService {
         res.setCreatedBy(resume.getCreatedBy());
         res.setUpdatedAt(resume.getUpdatedAt());
         res.setUpdatedBy(resume.getUpdatedBy());
+
+        if (resume.getJob() != null) {
+            res.setCompanyName(resume.getJob().getCompany().getName());
+        }
 
         res.setUser(new ResFetchResumeDTO.UserResume(
                 resume.getUser().getId(),

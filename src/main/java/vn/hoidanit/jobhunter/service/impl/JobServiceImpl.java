@@ -10,13 +10,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.Job;
+import vn.hoidanit.jobhunter.domain.Company;
 import vn.hoidanit.jobhunter.domain.Skill;
-import vn.hoidanit.jobhunter.domain.request.ReqJobDTO;
-import vn.hoidanit.jobhunter.domain.response.ResCreJobDTO;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
-import vn.hoidanit.jobhunter.mapper.JobMapper;
+import vn.hoidanit.jobhunter.domain.response.job.ResCreJobDTO;
 import vn.hoidanit.jobhunter.repository.JobRepository;
 import vn.hoidanit.jobhunter.repository.SkillRepository;
+import vn.hoidanit.jobhunter.repository.CompanyRepository;
 import vn.hoidanit.jobhunter.service.JobService;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 
@@ -24,73 +24,116 @@ import vn.hoidanit.jobhunter.util.error.IdInvalidException;
 public class JobServiceImpl implements JobService {
     private final JobRepository jobRepository;
     private final SkillRepository skillRepository;
+    private final CompanyRepository companyRepository;
 
-    public JobServiceImpl(JobRepository jobRepository, SkillRepository skillRepository) {
+    public JobServiceImpl(JobRepository jobRepository, SkillRepository skillRepository,
+            CompanyRepository companyRepository) {
         this.jobRepository = jobRepository;
         this.skillRepository = skillRepository;
+        this.companyRepository = companyRepository;
     }
 
     @Override
-    public ResCreJobDTO handleCreateJob(ReqJobDTO reqJobDTO) {
-        Job job = new Job();
-        job.setName(reqJobDTO.getName());
-        job.setLocation(reqJobDTO.getLocation());
-        job.setSalary(reqJobDTO.getSalary());
-        job.setQuantity(reqJobDTO.getQuantity());
-        job.setLevel(reqJobDTO.getLevel());
-        job.setDescription(reqJobDTO.getDescription());
-        job.setStartDate(reqJobDTO.getStartDate());
-        job.setEndDate(reqJobDTO.getEndDate());
-        job.setActive(reqJobDTO.isActive());
+    public ResCreJobDTO handleCreateJob(Job j) {
+        // check skills
+        if (j.getSkills() != null) {
+            List<Long> reqSkills = j.getSkills()
+                    .stream().map(x -> x.getId())
+                    .collect(Collectors.toList());
 
-        // Nếu không gửi skills thì set rỗng
-        List<Skill> skills = Optional.ofNullable(reqJobDTO.getSkills())
-                .orElse(List.of())
-                .stream()
-                .map(ReqJobDTO.SkillJob::getId)
-                .map(skillRepository::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
+            List<Skill> dbSkills = this.skillRepository.findByIdIn(reqSkills);
+            j.setSkills(dbSkills);
+        }
+        // check company
+        if (j.getCompany() != null) {
+            Optional<Company> cOptional = this.companyRepository.findById(j.getCompany().getId());
+            if (cOptional.isPresent()) {
+                j.setCompany(cOptional.get());
+            }
+        }
 
-        job.setSkills(skills);
+        // create job
+        Job currentJob = this.jobRepository.save(j);
 
-        Job savedJob = this.jobRepository.save(job);
+        // convert response
+        ResCreJobDTO dto = new ResCreJobDTO();
+        dto.setId(currentJob.getId());
+        dto.setName(currentJob.getName());
+        dto.setSalary(currentJob.getSalary());
+        dto.setQuantity(currentJob.getQuantity());
+        dto.setLocation(currentJob.getLocation());
+        dto.setLevel(currentJob.getLevel());
+        dto.setStartDate(currentJob.getStartDate());
+        dto.setEndDate(currentJob.getEndDate());
+        dto.setActive(currentJob.isActive());
+        dto.setCreatedAt(currentJob.getCreatedAt());
+        dto.setCreatedBy(currentJob.getCreatedBy());
 
-        return JobMapper.toResCreJobDTO(savedJob);
+        if (currentJob.getSkills() != null) {
+            List<String> skills = currentJob.getSkills()
+                    .stream().map(item -> item.getName())
+                    .collect(Collectors.toList());
+            dto.setSkills(skills);
+        }
+
+        return dto;
     }
 
     @Override
-    public ResCreJobDTO handleUpdateJob(ReqJobDTO reqJobDTO) throws IdInvalidException {
-        Job job = this.jobRepository.findById(reqJobDTO.getId())
-                .orElseThrow(() -> new IdInvalidException("Job not found with id = " + reqJobDTO.getId()));
+    public ResCreJobDTO handleUpdateJob(Job j, Job jobInDB) {
+        // check skills
+        if (j.getSkills() != null) {
+            List<Long> reqSkills = j.getSkills()
+                    .stream().map(x -> x.getId())
+                    .collect(Collectors.toList());
 
-        // Cập nhật các field
-        job.setName(reqJobDTO.getName());
-        job.setLocation(reqJobDTO.getLocation());
-        job.setSalary(reqJobDTO.getSalary());
-        job.setQuantity(reqJobDTO.getQuantity());
-        job.setLevel(reqJobDTO.getLevel());
-        job.setDescription(reqJobDTO.getDescription());
-        job.setStartDate(reqJobDTO.getStartDate());
-        job.setEndDate(reqJobDTO.getEndDate());
-        job.setActive(reqJobDTO.isActive());
+            List<Skill> dbSkills = this.skillRepository.findByIdIn(reqSkills);
+            jobInDB.setSkills(dbSkills);
+        }
 
-        // Cập nhật skills (nếu có)
-        List<Skill> skills = Optional.ofNullable(reqJobDTO.getSkills())
-                .orElse(List.of())
-                .stream()
-                .map(ReqJobDTO.SkillJob::getId)
-                .map(skillRepository::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
+        // check company
+        if (j.getCompany() != null) {
+            Optional<Company> cOptional = this.companyRepository.findById(j.getCompany().getId());
+            if (cOptional.isPresent()) {
+                jobInDB.setCompany(cOptional.get());
+            }
+        }
 
-        job.setSkills(skills);
+        // update correct info
+        jobInDB.setName(j.getName());
+        jobInDB.setSalary(j.getSalary());
+        jobInDB.setQuantity(j.getQuantity());
+        jobInDB.setLocation(j.getLocation());
+        jobInDB.setLevel(j.getLevel());
+        jobInDB.setStartDate(j.getStartDate());
+        jobInDB.setEndDate(j.getEndDate());
+        jobInDB.setActive(j.isActive());
 
-        Job savedJob = this.jobRepository.save(job);
+        // update job
+        Job currentJob = this.jobRepository.save(jobInDB);
 
-        return JobMapper.toResCreJobDTO(savedJob);
+        // convert response
+        ResCreJobDTO dto = new ResCreJobDTO();
+        dto.setId(currentJob.getId());
+        dto.setName(currentJob.getName());
+        dto.setSalary(currentJob.getSalary());
+        dto.setQuantity(currentJob.getQuantity());
+        dto.setLocation(currentJob.getLocation());
+        dto.setLevel(currentJob.getLevel());
+        dto.setStartDate(currentJob.getStartDate());
+        dto.setEndDate(currentJob.getEndDate());
+        dto.setActive(currentJob.isActive());
+        dto.setCreatedAt(currentJob.getCreatedAt());
+        dto.setCreatedBy(currentJob.getCreatedBy());
+
+        if (currentJob.getSkills() != null) {
+            List<String> skills = currentJob.getSkills()
+                    .stream().map(item -> item.getName())
+                    .collect(Collectors.toList());
+            dto.setSkills(skills);
+        }
+
+        return dto;
     }
 
     @Override
@@ -120,9 +163,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job handleFetchJobById(Long id) {
-        return this.jobRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Id không tồn tại: " + id));
+    public Job handleFetchJobById(Long id) throws IdInvalidException {
+        return this.jobRepository.findById(id).orElseThrow(() -> new IdInvalidException("Id job này ko tồn tại"));
     }
 
 }

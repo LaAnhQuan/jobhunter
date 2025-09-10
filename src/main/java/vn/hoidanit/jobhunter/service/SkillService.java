@@ -18,4 +18,5 @@ public interface SkillService {
     void deleteSkill(Long id);
 
     Skill fetchSkillById(Long id);
+
 }

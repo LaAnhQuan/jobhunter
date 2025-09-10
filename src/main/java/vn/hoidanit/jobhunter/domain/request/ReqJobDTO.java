@@ -15,12 +15,12 @@ import vn.hoidanit.jobhunter.util.constant.LevelEnum;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReqJobDTO {
-    private long id;
+    private Long id;
     private String name;
     private String location;
-    private double salary;
+    private Double salary;
 
-    private int quantity;
+    private Integer quantity;
 
     private LevelEnum level;
 
@@ -28,7 +28,7 @@ public class ReqJobDTO {
     private String description;
     private Instant startDate;
     private Instant endDate;
-    private boolean active;
+    private Boolean active;
     private List<SkillJob> skills;
 
     @Getter

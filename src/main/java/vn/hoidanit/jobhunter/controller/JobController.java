@@ -1,5 +1,7 @@
 package vn.hoidanit.jobhunter.controller;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -15,10 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.turkraft.springfilter.boot.Filter;
 
+import jakarta.validation.Valid;
 import vn.hoidanit.jobhunter.domain.Job;
 import vn.hoidanit.jobhunter.domain.request.ReqJobDTO;
-import vn.hoidanit.jobhunter.domain.response.ResCreJobDTO;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
+import vn.hoidanit.jobhunter.domain.response.job.ResCreJobDTO;
 import vn.hoidanit.jobhunter.service.JobService;
 import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 import vn.hoidanit.jobhunter.util.error.IdInvalidException;
@@ -34,18 +37,18 @@ public class JobController {
 
     @PostMapping("/jobs")
     @ApiMessage("Create a new job")
-    public ResponseEntity<ResCreJobDTO> createNewJob(@RequestBody ReqJobDTO reqCreJobDTO)
-            throws IdInvalidException {
-        ResCreJobDTO resCreJobDTO = this.jobService.handleCreateJob(reqCreJobDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(resCreJobDTO);
+    public ResponseEntity<ResCreJobDTO> createNewJob(@Valid @RequestBody Job job) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.jobService.handleCreateJob(job));
     }
 
     @PutMapping("/jobs")
-    @ApiMessage("Create a new job")
-    public ResponseEntity<ResCreJobDTO> updateJob(@RequestBody ReqJobDTO reqCreJobDTO)
-            throws IdInvalidException {
-        ResCreJobDTO resCreJobDTO = this.jobService.handleUpdateJob(reqCreJobDTO);
-        return ResponseEntity.status(HttpStatus.OK).body(resCreJobDTO);
+    @ApiMessage("Update a  job")
+    public ResponseEntity<ResCreJobDTO> updateJob(@Valid @RequestBody Job job) throws IdInvalidException {
+        Job currentJob = this.jobService.handleFetchJobById(job.getId());
+        if (currentJob != null) {
+            throw new IdInvalidException("Job not found");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(this.jobService.handleUpdateJob(job, currentJob.get()));
     }
 
     @DeleteMapping("/jobs/{id}")
@@ -63,8 +66,8 @@ public class JobController {
     }
 
     @GetMapping("/jobs/{id}")
-    @ApiMessage("Get all jobs")
-    public ResponseEntity<Job> getAllJob(@PathVariable("id") long id) {
+    @ApiMessage("Get a jobs by id")
+    public ResponseEntity<Job> getAllJob(@PathVariable("id") long id) throws IdInvalidException {
         return ResponseEntity.status(HttpStatus.OK).body(this.jobService.handleFetchJobById(id));
     }
 }
