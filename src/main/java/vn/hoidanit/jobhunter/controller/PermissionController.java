@@ -47,14 +47,18 @@ public class PermissionController {
     @PutMapping("/permissions")
     @ApiMessage("Update a permission")
     public ResponseEntity<Permission> update(@Valid @RequestBody Permission p) throws IdInvalidException {
-        // check exist
+        // check exist by id
         if (this.permissionService.fetchById(p.getId()) == null) {
             throw new IdInvalidException("Permission với id = " + p.getId() + " không tồn tại");
         }
 
-        // check exist
+        // check exist by module, apiPath and method
         if (this.permissionService.isPermissionExist(p)) {
-            throw new IdInvalidException("Permission đã tồn tại");
+            //check name
+            if(this.permissionService.isSameName(p)){
+                throw new IdInvalidException("Permission đã tồn tại");
+            }
+
         }
         // create new permission
         return ResponseEntity.status(HttpStatus.CREATED).body(this.permissionService.update(p));

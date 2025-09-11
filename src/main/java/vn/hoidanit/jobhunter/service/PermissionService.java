@@ -18,4 +18,6 @@ public interface PermissionService {
     void delete(long id);
 
     ResultPaginationDTO getPermissions(Specification<Permission> spec, Pageable pageable);
+
+    boolean isSameName(Permission p);
 }
