@@ -80,7 +80,7 @@ public class RoleServiceImpl implements RoleService {
         this.roleRepository.deleteById(id);
     }
 
-    public ResultPaginationDTO GetRoles(Specification<Role> spec, Pageable pageable) {
+    public ResultPaginationDTO getRoles(Specification<Role> spec, Pageable pageable) {
         // Lấy danh sách các Role dựa trên Specification và Pageable
         Page<Role> pRole = this.roleRepository.findAll(spec, pageable);
 

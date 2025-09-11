@@ -24,4 +24,6 @@ public interface ResumeService {
     ResFetchResumeDTO getResume(Resume resume);
 
     ResultPaginationDTO fetchAllResume(Specification<Resume> spec, Pageable pageable);
+
+    ResultPaginationDTO fetchResumeByUser(Pageable pageable);
 }

@@ -62,8 +62,11 @@ public class AuthController {
         User currentUserDB = this.userService.handleGetUserByUsername(loginDTO.getUsername());
 
         if (currentUserDB != null) {
-            ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(currentUserDB.getId(), currentUserDB.getEmail(),
-                    currentUserDB.getName());
+            ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(
+                    currentUserDB.getId(),
+                    currentUserDB.getEmail(),
+                    currentUserDB.getName(),
+                    currentUserDB.getRole());
             res.setUser(userLogin);
         }
 
@@ -72,7 +75,8 @@ public class AuthController {
         res.setAccessToken(access_token);
 
         // create refresh token
-        String refresh_token = this.securityUtil.createRefreshToken(loginDTO.getUsername(), res);
+        String refresh_token = this.securityUtil.createRefreshToken(
+                loginDTO.getUsername(), res);
         // update user
         this.userService.updateUserToken(refresh_token, loginDTO.getUsername());
 
@@ -101,6 +105,7 @@ public class AuthController {
             userLogin.setId(currentUserDB.getId());
             userLogin.setEmail(currentUserDB.getEmail());
             userLogin.setName(currentUserDB.getName());
+            userLogin.setRole(currentUserDB.getRole());
             userGetAccount.setUser(userLogin);
         }
         return ResponseEntity.ok().body(userGetAccount);
@@ -127,8 +132,11 @@ public class AuthController {
         User currentUserDB = this.userService.handleGetUserByUsername(email);
 
         if (currentUserDB != null) {
-            ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(currentUserDB.getId(), currentUserDB.getEmail(),
-                    currentUserDB.getName());
+            ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(
+                    currentUserDB.getId(),
+                    currentUserDB.getEmail(),
+                    currentUserDB.getName(),
+                    currentUserDB.getRole());
             res.setUser(userLogin);
         }
 

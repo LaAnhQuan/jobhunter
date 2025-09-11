@@ -27,9 +27,15 @@ public class UserMapper {
 
     public static ResUserDTO toResUserDTO(User user) {
         ResUserDTO.CompanyUser com = new ResUserDTO.CompanyUser();
+        ResUserDTO.RoleUser roleUser = new ResUserDTO.RoleUser();
         if (user.getCompany() != null) {
             com.setId(user.getCompany().getId());
             com.setName(user.getCompany().getName());
+        }
+
+        if(user.getRole() != null){
+            roleUser.setId(user.getRole().getId());
+            roleUser.setName(user.getRole().getName());
         }
         return new ResUserDTO(
                 user.getId(),
@@ -40,7 +46,7 @@ public class UserMapper {
                 user.getAge(),
                 user.getUpdatedAt(),
                 user.getCreatedAt(),
-                com);
+                com, roleUser);
     }
 
     public static ResUpUserDTO toResUpUserDTO(User user) {

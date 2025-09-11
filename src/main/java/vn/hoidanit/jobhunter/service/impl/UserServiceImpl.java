@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import vn.hoidanit.jobhunter.domain.Company;
+import vn.hoidanit.jobhunter.domain.Role;
 import vn.hoidanit.jobhunter.domain.User;
 import vn.hoidanit.jobhunter.domain.response.ResCreUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResUpUserDTO;
@@ -19,6 +20,7 @@ import vn.hoidanit.jobhunter.domain.response.ResUserDTO;
 import vn.hoidanit.jobhunter.domain.response.ResultPaginationDTO;
 import vn.hoidanit.jobhunter.repository.UserRepository;
 import vn.hoidanit.jobhunter.service.CompanyService;
+import vn.hoidanit.jobhunter.service.RoleService;
 import vn.hoidanit.jobhunter.service.UserService;
 import vn.hoidanit.jobhunter.mapper.UserMapper;
 
@@ -26,11 +28,13 @@ import vn.hoidanit.jobhunter.mapper.UserMapper;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final CompanyService companyService;
+    private final RoleService roleService;
 
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
-            CompanyService companyService) {
+                           CompanyService companyService, RoleService roleService) {
         this.userRepository = userRepository;
         this.companyService = companyService;
+        this.roleService = roleService;
     }
 
     public boolean isEmailExist(String email) {
@@ -51,6 +55,11 @@ public class UserServiceImpl implements UserService {
         if (user.getCompany() != null) {
             Optional<Company> companyOptional = this.companyService.findById(user.getCompany().getId());
             user.setCompany(companyOptional.isPresent() ? companyOptional.get() : null);
+        }
+        //check role
+        if(user.getRole() != null){
+            Role r = this.roleService.fetchById(user.getRole().getId());
+            user.setRole(r != null ? r : null);
         }
         User savedUser = userRepository.save(user);
         return UserMapper.toResCreUserDTO(savedUser);
@@ -80,6 +89,12 @@ public class UserServiceImpl implements UserService {
         if (user.getCompany() != null) {
             Optional<Company> companyOptional = this.companyService.findById(user.getCompany().getId());
             existingUser.setCompany(companyOptional.isPresent() ? companyOptional.get() : null);
+        }
+
+        //check role
+        if(user.getRole() != null){
+            Role r = this.roleService.fetchById(user.getRole().getId());
+            existingUser.setRole(r != null ? r : null);
         }
 
         userRepository.save(existingUser);
