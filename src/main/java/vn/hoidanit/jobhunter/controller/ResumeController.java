@@ -84,6 +84,7 @@ public class ResumeController {
                 .body(this.resumeService.getResume(reqResumeOptional.get()));
     }
 
+    //test commit
     @GetMapping("/resumes")
     @ApiMessage("Fetch all resume with paginate")
     public ResponseEntity<ResultPaginationDTO> fetchAll(
