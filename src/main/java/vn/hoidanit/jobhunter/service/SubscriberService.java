@@ -12,4 +12,5 @@ public interface SubscriberService {
 
     Subscriber update(Subscriber subsDB, Subscriber subsRequest);
 
+    void sendSubscribersEmailJobs();
 }

@@ -4,23 +4,26 @@ package vn.hoidanit.jobhunter.controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import vn.hoidanit.jobhunter.service.MailService;
+import vn.hoidanit.jobhunter.service.EmailService;
+import vn.hoidanit.jobhunter.service.SubscriberService;
 import vn.hoidanit.jobhunter.util.annotation.ApiMessage;
 
 @RestController
 @RequestMapping("/api/v1")
 public class EmailController {
-    public final MailService mailService;
+    public final EmailService mailService;
+    public final SubscriberService subscriberService;
 
-    public EmailController(MailService mailService) {
+    public EmailController(EmailService mailService, SubscriberService subscriberService) {
         this.mailService = mailService;
+        this.subscriberService = subscriberService;
     }
 
 
     @GetMapping("/email")
     @ApiMessage("Send simple email")
     public String sendSimpleEmail(){
-        this.mailService.sendEmailFromTemplateSync("nitnit072004@gmail.com","test send email", "job");
+        this.subscriberService.sendSubscribersEmailJobs();
         return "ok";
     }
 }
